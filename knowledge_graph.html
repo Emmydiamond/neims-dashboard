@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #111111;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "red", "font": {"color": "white"}, "id": "Tinubu", "label": "Tinubu", "shape": "dot", "size": 10, "title": "Type: politician"}, {"color": "red", "font": {"color": "white"}, "id": "Kwankwaso", "label": "Kwankwaso", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Rabiu Kwankwaso", "label": "Rabiu Kwankwaso", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Bola Tinubu\u2019s", "label": "Bola Tinubu\u2019s", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "2027", "label": "2027", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Donald Trump", "label": "Donald Trump", "shape": "dot", "size": 15, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "US", "label": "US", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Iran", "label": "Iran", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "this year", "label": "this year", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "America", "label": "America", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Trump", "label": "Trump", "shape": "dot", "size": 15, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "18", "label": "18", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Bauchi", "label": "Bauchi", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "N7", "label": "N7", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "NBTE", "label": "NBTE", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "the Federal Government", "label": "the Federal Government", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Lassa", "label": "Lassa", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "West Africa", "label": "West Africa", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Phase III", "label": "Phase III", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "wi", "label": "wi", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Snakebite", "label": "Snakebite", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "millions", "label": "millions", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "every year", "label": "every year", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Sophie Okonedo Illuminates", "label": "Sophie Okonedo Illuminates", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Virginia Woolf\u2019s", "label": "Virginia Woolf\u2019s", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "\u201cMrs Dalloway", "label": "\u201cMrs Dalloway", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "London", "label": "London", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Lagos", "label": "Lagos", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Arie", "label": "Arie", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Clarissa", "label": "Clarissa", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Sophie Okonedo", "label": "Sophie Okonedo", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Bauchi APC", "label": "Bauchi APC", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "seven", "label": "seven", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "https://punchng.com/heavy-security-at-bauchi-apc-office-as-seven-aspirants-contest-guber-pr", "label": "https://punchng.com/heavy-security-at-bauchi-apc-office-as-seven-aspirants-contest-guber-pr", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Kano", "label": "Kano", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "The Federal Government", "label": "The Federal Government", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Nigeria", "label": "Nigeria", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Somalia", "label": "Somalia", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Global War Making", "label": "Global War Making", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Nick Turse", "label": "Nick Turse", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "American", "label": "American", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Somalis", "label": "Somalis", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Trump\u0027s Killing Spree", "label": "Trump\u0027s Killing Spree", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "first", "label": "first", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "The Nation", "label": "The Nation", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "NEDC", "label": "NEDC", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "130", "label": "130", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "FRCN", "label": "FRCN", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "six", "label": "six", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "North-East", "label": "North-East", "shape": "dot", "size": 5, "title": "Type: other"}]);
+                  edges = new vis.DataSet([{"from": "Tinubu", "to": "Kwankwaso", "value": 2}, {"from": "Tinubu", "to": "Rabiu Kwankwaso", "value": 2}, {"from": "Tinubu", "to": "Bola Tinubu\u2019s", "value": 2}, {"from": "Tinubu", "to": "2027", "value": 2}, {"from": "Kwankwaso", "to": "Rabiu Kwankwaso", "value": 2}, {"from": "Kwankwaso", "to": "Bola Tinubu\u2019s", "value": 2}, {"from": "Kwankwaso", "to": "2027", "value": 2}, {"from": "Rabiu Kwankwaso", "to": "Bola Tinubu\u2019s", "value": 2}, {"from": "Rabiu Kwankwaso", "to": "2027", "value": 2}, {"from": "Bola Tinubu\u2019s", "to": "2027", "value": 2}, {"from": "2027", "to": "Bauchi APC", "value": 4}, {"from": "2027", "to": "seven", "value": 4}, {"from": "2027", "to": "https://punchng.com/heavy-security-at-bauchi-apc-office-as-seven-aspirants-contest-guber-pr", "value": 2}, {"from": "Donald Trump", "to": "US", "value": 4}, {"from": "Donald Trump", "to": "Iran", "value": 2}, {"from": "Donald Trump", "to": "this year", "value": 2}, {"from": "Donald Trump", "to": "America", "value": 2}, {"from": "Donald Trump", "to": "Trump", "value": 3}, {"from": "Donald Trump", "to": "Somalia", "value": 2}, {"from": "Donald Trump", "to": "Global War Making", "value": 2}, {"from": "Donald Trump", "to": "Nick Turse", "value": 1}, {"from": "Donald Trump", "to": "American", "value": 1}, {"from": "Donald Trump", "to": "Somalis", "value": 1}, {"from": "Donald Trump", "to": "Trump\u0027s Killing Spree", "value": 1}, {"from": "Donald Trump", "to": "first", "value": 1}, {"from": "Donald Trump", "to": "The Nation", "value": 1}, {"from": "US", "to": "US", "value": 2}, {"from": "US", "to": "Iran", "value": 4}, {"from": "US", "to": "this year", "value": 4}, {"from": "US", "to": "America", "value": 4}, {"from": "US", "to": "Trump", "value": 4}, {"from": "Iran", "to": "this year", "value": 2}, {"from": "Iran", "to": "America", "value": 2}, {"from": "Iran", "to": "Trump", "value": 2}, {"from": "this year", "to": "America", "value": 2}, {"from": "this year", "to": "Trump", "value": 2}, {"from": "America", "to": "Trump", "value": 2}, {"from": "Trump", "to": "Somalia", "value": 2}, {"from": "Trump", "to": "Global War Making", "value": 2}, {"from": "Trump", "to": "Nick Turse", "value": 1}, {"from": "Trump", "to": "American", "value": 1}, {"from": "Trump", "to": "Somalis", "value": 1}, {"from": "Trump", "to": "Trump\u0027s Killing Spree", "value": 1}, {"from": "Trump", "to": "first", "value": 1}, {"from": "Trump", "to": "The Nation", "value": 1}, {"from": "18", "to": "Bauchi", "value": 4}, {"from": "18", "to": "18", "value": 2}, {"from": "18", "to": "N7", "value": 4}, {"from": "Bauchi", "to": "N7", "value": 2}, {"from": "NBTE", "to": "the Federal Government", "value": 4}, {"from": "NBTE", "to": "NBTE", "value": 2}, {"from": "Lassa", "to": "Lassa", "value": 2}, {"from": "Lassa", "to": "West Africa", "value": 4}, {"from": "Lassa", "to": "Phase III", "value": 4}, {"from": "Lassa", "to": "wi", "value": 4}, {"from": "West Africa", "to": "Phase III", "value": 2}, {"from": "West Africa", "to": "wi", "value": 2}, {"from": "Phase III", "to": "wi", "value": 2}, {"from": "Snakebite", "to": "millions", "value": 2}, {"from": "Snakebite", "to": "every year", "value": 2}, {"from": "millions", "to": "every year", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "Virginia Woolf\u2019s", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "\u201cMrs Dalloway", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "London", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "Lagos", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "Arie", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "Clarissa", "value": 2}, {"from": "Sophie Okonedo Illuminates", "to": "Sophie Okonedo", "value": 2}, {"from": "Virginia Woolf\u2019s", "to": "\u201cMrs Dalloway", "value": 2}, {"from": "Virginia Woolf\u2019s", "to": "London", "value": 2}, {"from": "Virginia Woolf\u2019s", "to": "Lagos", "value": 2}, {"from": "Virginia Woolf\u2019s", "to": "Arie", "value": 2}, {"from": "Virginia Woolf\u2019s", "to": "Clarissa", "value": 2}, {"from": "Virginia Woolf\u2019s", "to": "Sophie Okonedo", "value": 2}, {"from": "\u201cMrs Dalloway", "to": "London", "value": 2}, {"from": "\u201cMrs Dalloway", "to": "Lagos", "value": 2}, {"from": "\u201cMrs Dalloway", "to": "Arie", "value": 2}, {"from": "\u201cMrs Dalloway", "to": "Clarissa", "value": 2}, {"from": "\u201cMrs Dalloway", "to": "Sophie Okonedo", "value": 2}, {"from": "London", "to": "Lagos", "value": 2}, {"from": "London", "to": "Arie", "value": 2}, {"from": "London", "to": "Clarissa", "value": 2}, {"from": "London", "to": "Sophie Okonedo", "value": 2}, {"from": "Lagos", "to": "Arie", "value": 2}, {"from": "Lagos", "to": "Clarissa", "value": 2}, {"from": "Lagos", "to": "Sophie Okonedo", "value": 2}, {"from": "Arie", "to": "Clarissa", "value": 2}, {"from": "Arie", "to": "Sophie Okonedo", "value": 2}, {"from": "Clarissa", "to": "Sophie Okonedo", "value": 2}, {"from": "Bauchi APC", "to": "seven", "value": 8}, {"from": "Bauchi APC", "to": "Bauchi APC", "value": 2}, {"from": "Bauchi APC", "to": "https://punchng.com/heavy-security-at-bauchi-apc-office-as-seven-aspirants-contest-guber-pr", "value": 4}, {"from": "seven", "to": "seven", "value": 2}, {"from": "seven", "to": "https://punchng.com/heavy-security-at-bauchi-apc-office-as-seven-aspirants-contest-guber-pr", "value": 4}, {"from": "The Federal Government", "to": "Nigeria", "value": 1}, {"from": "Somalia", "to": "Global War Making", "value": 4}, {"from": "Somalia", "to": "Nick Turse", "value": 2}, {"from": "Somalia", "to": "American", "value": 2}, {"from": "Somalia", "to": "Somalis", "value": 2}, {"from": "Somalia", "to": "Trump\u0027s Killing Spree", "value": 2}, {"from": "Somalia", "to": "Somalia", "value": 1}, {"from": "Somalia", "to": "first", "value": 2}, {"from": "Somalia", "to": "The Nation", "value": 2}, {"from": "Global War Making", "to": "Nick Turse", "value": 2}, {"from": "Global War Making", "to": "American", "value": 2}, {"from": "Global War Making", "to": "Somalis", "value": 2}, {"from": "Global War Making", "to": "Trump\u0027s Killing Spree", "value": 2}, {"from": "Global War Making", "to": "Global War Making", "value": 1}, {"from": "Global War Making", "to": "first", "value": 2}, {"from": "Global War Making", "to": "The Nation", "value": 2}, {"from": "Nick Turse", "to": "American", "value": 1}, {"from": "Nick Turse", "to": "Somalis", "value": 1}, {"from": "Nick Turse", "to": "Trump\u0027s Killing Spree", "value": 1}, {"from": "Nick Turse", "to": "first", "value": 1}, {"from": "Nick Turse", "to": "The Nation", "value": 1}, {"from": "American", "to": "Somalis", "value": 1}, {"from": "American", "to": "Trump\u0027s Killing Spree", "value": 1}, {"from": "American", "to": "first", "value": 1}, {"from": "American", "to": "The Nation", "value": 1}, {"from": "Somalis", "to": "Trump\u0027s Killing Spree", "value": 1}, {"from": "Somalis", "to": "first", "value": 1}, {"from": "Somalis", "to": "The Nation", "value": 1}, {"from": "Trump\u0027s Killing Spree", "to": "first", "value": 1}, {"from": "Trump\u0027s Killing Spree", "to": "The Nation", "value": 1}, {"from": "first", "to": "The Nation", "value": 1}, {"from": "NEDC", "to": "130", "value": 4}, {"from": "NEDC", "to": "FRCN", "value": 4}, {"from": "NEDC", "to": "NEDC", "value": 1}, {"from": "NEDC", "to": "six", "value": 2}, {"from": "NEDC", "to": "North-East", "value": 2}, {"from": "130", "to": "FRCN", "value": 4}, {"from": "130", "to": "130", "value": 1}, {"from": "130", "to": "six", "value": 2}, {"from": "130", "to": "North-East", "value": 2}, {"from": "FRCN", "to": "six", "value": 2}, {"from": "FRCN", "to": "North-East", "value": 2}, {"from": "FRCN", "to": "FRCN", "value": 1}, {"from": "six", "to": "North-East", "value": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
