@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #111111;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "gray", "font": {"color": "white"}, "id": "Tinubu", "label": "Tinubu", "shape": "dot", "size": 15, "title": "Type: politician"}, {"color": "gray", "font": {"color": "white"}, "id": "NIPR", "label": "NIPR", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "Ike Neliaku", "label": "Ike Neliaku", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "the Global Alliance for Public Relations and Communication Management\n\nRead", "label": "the Global Alliance for Public Relations and Communication Management\n\nRead", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "https://punchng.com/tinubu-congratulates-nipr-president-on-re-election-to-global-pr-board/", "label": "https://punchng.com/tinubu-congratulates-nipr-president-on-re-election-to-global-pr-board/", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "FAAN", "label": "FAAN", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Nigeria", "label": "Nigeria", "shape": "dot", "size": 20, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "NABTEB", "label": "NABTEB", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "2026", "label": "2026", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "June 13", "label": "June 13", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "May 31", "label": "May 31", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "N200", "label": "N200", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Kano State Government", "label": "Kano State Government", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "ADC", "label": "ADC", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "2027", "label": "2027", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Atiku Abubakar", "label": "Atiku Abubakar", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "the African Democratic Congress (ADC", "label": "the African Democratic Congress (ADC", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Nasarawa APC", "label": "Nasarawa APC", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Hassan Liman", "label": "Hassan Liman", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "APC", "label": "APC", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Ondo", "label": "Ondo", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "181,996", "label": "181,996", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Bola Tinubu", "label": "Bola Tinubu", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "green", "font": {"color": "white"}, "id": "Ondo State", "label": "Ondo State", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "achek", "label": "achek", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "PyPI", "label": "PyPI", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "Achek", "label": "Achek", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "WhatsApp OTP", "label": "WhatsApp OTP", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "AI chatbots \u0026 business", "label": "AI chatbots \u0026 business", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "gray", "font": {"color": "white"}, "id": "achek 2.0.0", "label": "achek 2.0.0", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Chinese", "label": "Chinese", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Lagos", "label": "Lagos", "shape": "dot", "size": 10, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "NDLEA", "label": "NDLEA", "shape": "dot", "size": 5, "title": "Type: other"}, {"color": "red", "font": {"color": "white"}, "id": "Canadian", "label": "Canadian", "shape": "dot", "size": 5, "title": "Type: other"}]);
+                  edges = new vis.DataSet([{"from": "Tinubu", "to": "NIPR", "value": 4}, {"from": "Tinubu", "to": "Tinubu", "value": 1}, {"from": "Tinubu", "to": "Ike Neliaku", "value": 2}, {"from": "Tinubu", "to": "the Global Alliance for Public Relations and Communication Management\n\nRead", "value": 2}, {"from": "Tinubu", "to": "https://punchng.com/tinubu-congratulates-nipr-president-on-re-election-to-global-pr-board/", "value": 2}, {"from": "Tinubu", "to": "APC", "value": 2}, {"from": "Tinubu", "to": "Ondo", "value": 1}, {"from": "Tinubu", "to": "181,996", "value": 2}, {"from": "Tinubu", "to": "Bola Tinubu", "value": 1}, {"from": "Tinubu", "to": "Ondo State", "value": 1}, {"from": "NIPR", "to": "Ike Neliaku", "value": 2}, {"from": "NIPR", "to": "NIPR", "value": 1}, {"from": "NIPR", "to": "the Global Alliance for Public Relations and Communication Management\n\nRead", "value": 2}, {"from": "NIPR", "to": "https://punchng.com/tinubu-congratulates-nipr-president-on-re-election-to-global-pr-board/", "value": 2}, {"from": "Ike Neliaku", "to": "the Global Alliance for Public Relations and Communication Management\n\nRead", "value": 1}, {"from": "Ike Neliaku", "to": "https://punchng.com/tinubu-congratulates-nipr-president-on-re-election-to-global-pr-board/", "value": 1}, {"from": "the Global Alliance for Public Relations and Communication Management\n\nRead", "to": "https://punchng.com/tinubu-congratulates-nipr-president-on-re-election-to-global-pr-board/", "value": 1}, {"from": "FAAN", "to": "FAAN", "value": 1}, {"from": "FAAN", "to": "Nigeria", "value": 2}, {"from": "Nigeria", "to": "achek", "value": 1}, {"from": "Nigeria", "to": "PyPI", "value": 1}, {"from": "Nigeria", "to": "Achek", "value": 2}, {"from": "Nigeria", "to": "WhatsApp OTP", "value": 2}, {"from": "Nigeria", "to": "AI chatbots \u0026 business", "value": 2}, {"from": "Nigeria", "to": "achek 2.0.0", "value": 1}, {"from": "Nigeria", "to": "Chinese", "value": 2}, {"from": "Nigeria", "to": "Lagos", "value": 2}, {"from": "Nigeria", "to": "NDLEA", "value": 1}, {"from": "Nigeria", "to": "Canadian", "value": 1}, {"from": "NABTEB", "to": "2026", "value": 4}, {"from": "NABTEB", "to": "June 13", "value": 4}, {"from": "NABTEB", "to": "NABTEB", "value": 1}, {"from": "NABTEB", "to": "May 31", "value": 2}, {"from": "2026", "to": "June 13", "value": 4}, {"from": "2026", "to": "2026", "value": 1}, {"from": "2026", "to": "May 31", "value": 2}, {"from": "June 13", "to": "May 31", "value": 2}, {"from": "June 13", "to": "June 13", "value": 1}, {"from": "N200", "to": "Kano State Government", "value": 2}, {"from": "N200", "to": "N200", "value": 1}, {"from": "ADC", "to": "2027", "value": 2}, {"from": "ADC", "to": "Atiku Abubakar", "value": 1}, {"from": "ADC", "to": "the African Democratic Congress (ADC", "value": 1}, {"from": "2027", "to": "Atiku Abubakar", "value": 2}, {"from": "2027", "to": "the African Democratic Congress (ADC", "value": 2}, {"from": "2027", "to": "2027", "value": 1}, {"from": "Atiku Abubakar", "to": "the African Democratic Congress (ADC", "value": 1}, {"from": "Nasarawa APC", "to": "Hassan Liman", "value": 2}, {"from": "Nasarawa APC", "to": "Nasarawa APC", "value": 1}, {"from": "APC", "to": "Ondo", "value": 2}, {"from": "APC", "to": "181,996", "value": 4}, {"from": "APC", "to": "Bola Tinubu", "value": 2}, {"from": "APC", "to": "APC", "value": 1}, {"from": "APC", "to": "Ondo State", "value": 2}, {"from": "Ondo", "to": "181,996", "value": 2}, {"from": "Ondo", "to": "Bola Tinubu", "value": 1}, {"from": "Ondo", "to": "Ondo State", "value": 1}, {"from": "181,996", "to": "Bola Tinubu", "value": 2}, {"from": "181,996", "to": "Ondo State", "value": 2}, {"from": "181,996", "to": "181,996", "value": 1}, {"from": "Bola Tinubu", "to": "Ondo State", "value": 1}, {"from": "achek", "to": "PyPI", "value": 1}, {"from": "achek", "to": "Achek", "value": 1}, {"from": "achek", "to": "WhatsApp OTP", "value": 1}, {"from": "achek", "to": "AI chatbots \u0026 business", "value": 1}, {"from": "PyPI", "to": "Achek", "value": 1}, {"from": "PyPI", "to": "WhatsApp OTP", "value": 1}, {"from": "PyPI", "to": "AI chatbots \u0026 business", "value": 1}, {"from": "Achek", "to": "WhatsApp OTP", "value": 2}, {"from": "Achek", "to": "AI chatbots \u0026 business", "value": 2}, {"from": "Achek", "to": "achek 2.0.0", "value": 1}, {"from": "WhatsApp OTP", "to": "AI chatbots \u0026 business", "value": 2}, {"from": "WhatsApp OTP", "to": "achek 2.0.0", "value": 1}, {"from": "AI chatbots \u0026 business", "to": "achek 2.0.0", "value": 1}, {"from": "Chinese", "to": "Lagos", "value": 4}, {"from": "Chinese", "to": "NDLEA", "value": 2}, {"from": "Chinese", "to": "Chinese", "value": 1}, {"from": "Chinese", "to": "Canadian", "value": 2}, {"from": "Lagos", "to": "NDLEA", "value": 2}, {"from": "Lagos", "to": "Canadian", "value": 2}, {"from": "Lagos", "to": "Lagos", "value": 1}, {"from": "NDLEA", "to": "Canadian", "value": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
