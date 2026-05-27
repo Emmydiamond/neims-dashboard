@@ -1,9 +1,8 @@
 from collections import defaultdict
-from pyvis.network import Network
-net = Network(notebook=False)
 import spacy
 import networkx as nx
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from pyvis.network import Network
 
 # -----------------------------
 # GLOBAL TRACKERS
@@ -12,15 +11,18 @@ entity_frequency = defaultdict(int)
 sentiment_tracker = defaultdict(list)
 party_sentiment = defaultdict(list)
 
+graph = nx.Graph()
+
 # -----------------------------
 # ENTITY CLASSIFICATION
 # -----------------------------
-POLITICIANS = {"Tinubu", "Atiku", "El-Rufai"}
+POLITICIANS = {"TINUBU", "ATIKU", "EL-RUFAI"}
 PARTIES = {"APC", "PDP", "LP"}
-INSTITUTIONS = {"INEC", "Police", "Government"}
+INSTITUTIONS = {"INEC", "POLICE", "GOVERNMENT"}
 
 
-def get_entity_type(name):
+def get_entity_type(name: str):
+    name = name.upper()
 
     if name in POLITICIANS:
         return "politician"
@@ -38,13 +40,11 @@ def get_entity_type(name):
 nlp = spacy.load("en_core_web_sm")
 analyzer = SentimentIntensityAnalyzer()
 
-graph = nx.Graph()
-
 
 # -----------------------------
 # MAIN ANALYSIS FUNCTION
 # -----------------------------
-def analyze_news(article_text):
+def analyze_news(article_text: str):
 
     doc = nlp(article_text)
 
@@ -64,27 +64,25 @@ def analyze_news(article_text):
     # -----------------------------
     for entity in entities:
 
-        node_name = entity["text"]
-        entity_type = get_entity_type(node_name.title())
+        node_name = entity["text"].strip()
+        entity_type = get_entity_type(node_name)
 
-        # global tracking
+        # tracking
         entity_frequency[node_name] += 1
         sentiment_tracker[node_name].append(compound)
 
-        # party-specific tracking
+        # party tracking
         if entity_type == "party":
             party_sentiment[node_name.upper()].append(compound)
 
         # graph nodes
         if not graph.has_node(node_name):
-
             graph.add_node(
                 node_name,
                 type=entity_type,
                 sentiment=compound,
                 weight=1
             )
-
         else:
             graph.nodes[node_name]["weight"] += 1
 
@@ -94,8 +92,8 @@ def analyze_news(article_text):
     for i in range(len(entities)):
         for j in range(i + 1, len(entities)):
 
-            node1 = entities[i]["text"]
-            node2 = entities[j]["text"]
+            node1 = entities[i]["text"].strip()
+            node2 = entities[j]["text"].strip()
 
             if graph.has_edge(node1, node2):
                 graph[node1][node2]["weight"] += 1
@@ -153,7 +151,7 @@ def generate_graph():
 
 
 # -----------------------------
-# INSIGHTS ENGINE
+# INSIGHTS ENGINE (FIXED)
 # -----------------------------
 def get_boss_insights():
 
@@ -166,6 +164,9 @@ def get_boss_insights():
     trending = []
 
     for entity, scores in sentiment_tracker.items():
+
+        if not scores:
+            continue
 
         avg_sentiment = sum(scores) / len(scores)
 
@@ -208,6 +209,9 @@ def get_party_power_map():
     result = {}
 
     for party, scores in party_sentiment.items():
+
+        if not scores:
+            continue
 
         avg_sentiment = sum(scores) / len(scores)
 

@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+load_dotenv()
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -12,7 +13,7 @@ import requests
 from graph_engine import analyze_news, generate_graph, get_boss_insights, get_party_power_map
 app = FastAPI()
 
-API_KEY = "a37684c7717f480e82baa2d2d893973c"
+API_KEY = os.getenv("NEWS_API_KEY")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -82,12 +83,6 @@ def get_news():
         "articles": articles
     }
 
-
-@app.get("/graph")
-def get_graph():
-    return FileResponse("knowledge_graph.html")
-
-
 from fastapi.responses import HTMLResponse
 
 @app.get("/graph")
@@ -98,3 +93,14 @@ def get_graph():
 @app.get("/party-map")
 def party_map():
     return get_party_power_map()
+
+@app.get("/insights")
+def insights():
+    return get_boss_insights()
+
+@app.get("/test")
+def test():
+    return {"status": "ok"}
+@app.get("/ping")
+def ping():
+    return {"status": "alive"}
