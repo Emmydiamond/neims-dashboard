@@ -96,8 +96,11 @@ def party_map():
 
 @app.get("/insights")
 def insights():
-    return get_boss_insights()
-
+    try:
+        return get_boss_insights()
+    except Exception as e:
+        return {"error": str(e)}
+    
 @app.get("/test")
 def test():
     return {"status": "ok"}
