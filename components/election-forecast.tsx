@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -201,6 +201,7 @@ function MiniMetricCard({
 }
 
 export function ElectionForecast() {
+  const [mounted, setMounted] = useState(false);useEffect(() => {setMounted(true);}, []);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("30d")
   const [selectedParties, setSelectedParties] = useState<string[]>(Object.keys(partyColors))
   const [isAnimating, setIsAnimating] = useState(true)
@@ -234,6 +235,7 @@ export function ElectionForecast() {
     )
   }
 
+  if (!mounted) return null;
   return (
     <section className="px-6 py-16">
       <div className="max-w-[1600px] mx-auto">
@@ -319,7 +321,7 @@ export function ElectionForecast() {
                       style={{ backgroundColor: partyColors[party] }}
                     />
                     {party}
-                    <span className="ml-1 opacity-70">{latestData[party]}%</span>
+                    <span className="ml-1 opacity-70">{latestData?.[party] ?? 0}% </span>
                   </button>
                 ))}
               </div>
