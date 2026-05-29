@@ -44,9 +44,16 @@ function App() {
       .then((data) => setInsights(data || {}))
       .catch((err) => console.error("insights error:", err));
   }, []);
-  if (!user) {
-  return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
+  if (!user) { 
+    return ( 
+     <div 
+       style={{ 
+         height: "100vh", 
+         display: "flex", 
+         flexDirection: "column", 
+         justifyContent: "center", 
+         alignItems: "center", 
+         background: "#0f172a", color: "white", }} >
       <h1>NEIMS Intelligence System</h1>
       <button onClick={handleLogin}>
         Sign in with Google
