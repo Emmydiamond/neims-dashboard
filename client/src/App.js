@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [insights, setInsights] = useState({});
   const [partyMap, setPartyMap] = useState({});
   const [articles, setArticles] = useState([]);
 
-  // 🔐 Firebase Auth Listener (THIS FIXES EVERYTHING)
+  // 🔐 AUTH STATE LISTENER (CRITICAL FIX)
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -28,10 +31,14 @@ function App() {
 
   // 🔓 LOGOUT
   const handleLogout = async () => {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
-  // 📊 FETCH DATA
+  // 📊 FETCH BACKEND DATA
   useEffect(() => {
     fetch("https://neims-dashboard-2.onrender.com/news")
       .then((res) => res.json())
@@ -49,11 +56,26 @@ function App() {
       .catch((err) => console.error("insights error:", err));
   }, []);
 
-  const positiveCount = articles.filter(a => a.sentiment === "positive").length;
-  const negativeCount = articles.filter(a => a.sentiment === "negative").length;
-  const neutralCount = articles.filter(a => a.sentiment === "neutral").length;
+  // 📌 LOADING SCREEN (IMPORTANT FIX)
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#0f172a",
+          color: "white",
+          fontSize: "18px",
+        }}
+      >
+        Loading NEIMS Intelligence System...
+      </div>
+    );
+  }
 
-  // 🔴 LOGIN SCREEN (GUARD)
+  // 🔴 LOGIN SCREEN (AUTH GATE)
   if (!user) {
     return (
       <div
@@ -68,18 +90,37 @@ function App() {
         }}
       >
         <h1>NEIMS Intelligence System</h1>
-        <button onClick={handleLogin}>
+        <button
+          onClick={handleLogin}
+          style={{
+            padding: "10px 20px",
+            marginTop: "20px",
+            cursor: "pointer",
+          }}
+        >
           Sign in with Google
         </button>
       </div>
     );
   }
 
-  // 🟢 DASHBOARD
+  // 📊 SENTIMENT COUNTS
+  const positiveCount = articles.filter(
+    (a) => a.sentiment === "positive"
+  ).length;
+
+  const negativeCount = articles.filter(
+    (a) => a.sentiment === "negative"
+  ).length;
+
+  const neutralCount = articles.filter(
+    (a) => a.sentiment === "neutral"
+  ).length;
+
+  // 🟢 DASHBOARD UI
   return (
     <div style={styles.app}>
-
-      {/* Sidebar */}
+      {/* SIDEBAR */}
       <div style={styles.sidebar}>
         <h2>NEIMS</h2>
         <p style={{ fontSize: "12px", opacity: 0.6 }}>
@@ -93,16 +134,19 @@ function App() {
           <li>Entity Graph</li>
         </ul>
 
-        <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+        <button
+          onClick={handleLogout}
+          style={{ marginTop: "20px", cursor: "pointer" }}
+        >
           Logout
         </button>
       </div>
 
-      {/* Main */}
+      {/* MAIN */}
       <div style={styles.main}>
         <h1 style={styles.title}>🇳🇬 NEIMS Intelligence Dashboard</h1>
 
-        {/* KPI */}
+        {/* KPI CARDS */}
         <div style={styles.kpiGrid}>
           <div style={styles.kpiCard}>
             <h3>Total Articles</h3>
@@ -127,7 +171,6 @@ function App() {
 
         {/* GRID */}
         <div style={styles.grid}>
-
           <div style={styles.panel}>
             <h2>Election Pressure Index</h2>
             <h1 style={{ fontSize: "50px" }}>
@@ -155,7 +198,7 @@ function App() {
             src="https://neims-dashboard-2.onrender.com/graph"
             width="100%"
             height="600"
-            title="Graph"
+            title="graph"
             style={{ border: "none", borderRadius: "12px" }}
           />
         </div>
@@ -170,7 +213,12 @@ function App() {
               <p>{article.source}</p>
               <p>{article.sentiment}</p>
 
-              <a href={article.url} target="_blank" rel="noreferrer">
+              <a
+                href={article.url}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#38bdf8" }}
+              >
                 Read More →
               </a>
             </div>
@@ -181,24 +229,93 @@ function App() {
   );
 }
 
-/* STYLES (unchanged) */
+/* STYLES */
 const styles = {
-  app: { display: "flex", minHeight: "100vh", fontFamily: "Arial" },
-  sidebar: { width: "250px", backgroundColor: "#020617", color: "white", padding: "30px" },
-  menu: { listStyle: "none", padding: 0, marginTop: "40px", lineHeight: "2" },
-  main: { flex: 1, backgroundColor: "#0f172a", padding: "40px", color: "white" },
-  title: { marginBottom: "30px", fontSize: "36px" },
-  kpiGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "15px", marginBottom: "20px" },
-  kpiCard: { background: "#1e293b", padding: "20px", borderRadius: "12px" },
-  kpiCardGreen: { background: "#14532d", padding: "20px", borderRadius: "12px" },
-  kpiCardRed: { background: "#7f1d1d", padding: "20px", borderRadius: "12px" },
-  kpiCardGray: { background: "#334155", padding: "20px", borderRadius: "12px" },
-  grid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px" },
-  panel: { background: "#1e293b", padding: "20px", borderRadius: "12px" },
-  partyRow: { display: "flex", justifyContent: "space-between", marginTop: "10px" },
-  graphPanel: { marginTop: "30px", padding: "20px", borderRadius: "12px" },
-  newsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "15px", marginTop: "20px" },
-  card: { backgroundColor: "#1e293b", padding: "20px", borderRadius: "12px" },
+  app: {
+    display: "flex",
+    minHeight: "100vh",
+    fontFamily: "Arial",
+  },
+  sidebar: {
+    width: "250px",
+    backgroundColor: "#020617",
+    color: "white",
+    padding: "30px",
+  },
+  menu: {
+    listStyle: "none",
+    padding: 0,
+    marginTop: "40px",
+    lineHeight: "2",
+  },
+  main: {
+    flex: 1,
+    backgroundColor: "#0f172a",
+    padding: "40px",
+    color: "white",
+  },
+  title: {
+    marginBottom: "30px",
+    fontSize: "36px",
+  },
+  kpiGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: "15px",
+    marginBottom: "20px",
+  },
+  kpiCard: {
+    background: "#1e293b",
+    padding: "20px",
+    borderRadius: "12px",
+  },
+  kpiCardGreen: {
+    background: "#14532d",
+    padding: "20px",
+    borderRadius: "12px",
+  },
+  kpiCardRed: {
+    background: "#7f1d1d",
+    padding: "20px",
+    borderRadius: "12px",
+  },
+  kpiCardGray: {
+    background: "#334155",
+    padding: "20px",
+    borderRadius: "12px",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "20px",
+    marginTop: "20px",
+  },
+  panel: {
+    background: "#1e293b",
+    padding: "20px",
+    borderRadius: "12px",
+  },
+  partyRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: "10px",
+  },
+  graphPanel: {
+    marginTop: "30px",
+    padding: "20px",
+    borderRadius: "12px",
+  },
+  newsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: "15px",
+    marginTop: "20px",
+  },
+  card: {
+    backgroundColor: "#1e293b",
+    padding: "20px",
+    borderRadius: "12px",
+  },
 };
 
 export default App;
