@@ -10,7 +10,7 @@ function App() {
   const [partyMap, setPartyMap] = useState({});
   const [articles, setArticles] = useState([]);
 
-  // 🔐 Firebase Auth Listener (DO NOT REMOVE)
+  // AUTH LISTENER
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -20,7 +20,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // 🔑 LOGIN FUNCTION
+  // LOGIN
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, provider);
@@ -29,43 +29,40 @@ function App() {
     }
   };
 
-  // 🔓 LOGOUT FUNCTION
+  // LOGOUT (FIXED)
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      localStorage.clear();
+      sessionStorage.clear();
       setUser(null);
-  }   catch (error) {
+    } catch (error) {
       console.error("Logout error:", error);
-}
-};
-  // 📊 FETCH BACKEND DATA
+    }
+  };
+
+  // FETCH DATA
   useEffect(() => {
     fetch("https://neims-dashboard-2.onrender.com/news")
       .then((res) => res.json())
       .then((data) => setArticles(data?.articles || []))
-      .catch((err) => console.error("news error:", err));
+      .catch((err) => console.error(err));
 
     fetch("https://neims-dashboard-2.onrender.com/party-map")
       .then((res) => res.json())
       .then((data) => setPartyMap(data || {}))
-      .catch((err) => console.error("party-map error:", err));
+      .catch((err) => console.error(err));
 
     fetch("https://neims-dashboard-2.onrender.com/insights")
       .then((res) => res.json())
       .then((data) => setInsights(data || {}))
-      .catch((err) => console.error("insights error:", err));
+      .catch((err) => console.error(err));
   }, []);
 
-  // ⏳ LOADING SCREEN (VERY IMPORTANT)
   if (loading) {
-    return (
-      <div style={styles.loading}>
-        Loading NEIMS Intelligence System...
-      </div>
-    );
+    return <div style={styles.loading}>Loading...</div>;
   }
 
-  // 🔴 LOGIN SCREEN (AUTH GATE)
   if (!user) {
     return (
       <div style={styles.login}>
@@ -77,24 +74,13 @@ function App() {
     );
   }
 
-  // 📊 SENTIMENT CALCULATION
-  const positiveCount = articles.filter(
-    (a) => a.sentiment === "positive"
-  ).length;
+  const positiveCount = articles.filter(a => a.sentiment === "positive").length;
+  const negativeCount = articles.filter(a => a.sentiment === "negative").length;
+  const neutralCount = articles.filter(a => a.sentiment === "neutral").length;
 
-  const negativeCount = articles.filter(
-    (a) => a.sentiment === "negative"
-  ).length;
-
-  const neutralCount = articles.filter(
-    (a) => a.sentiment === "neutral"
-  ).length;
-
-  // 🟢 DASHBOARD
   return (
     <div style={styles.app}>
 
-      {/* SIDEBAR */}
       <div style={styles.sidebar}>
         <h2>NEIMS</h2>
 
@@ -110,11 +96,9 @@ function App() {
         </button>
       </div>
 
-      {/* MAIN */}
       <div style={styles.main}>
         <h1>🇳🇬 NEIMS Dashboard</h1>
 
-        {/* KPI */}
         <div style={styles.kpiGrid}>
           <div style={styles.card}>Total: {articles.length}</div>
           <div style={styles.green}>Positive: {positiveCount}</div>
@@ -122,16 +106,13 @@ function App() {
           <div style={styles.gray}>Neutral: {neutralCount}</div>
         </div>
 
-        {/* INSIGHTS */}
         <div style={styles.panel}>
           <h2>Election Pressure Index</h2>
           <h1>{insights?.election_pressure_score ?? 0}</h1>
         </div>
 
-        {/* PARTY MAP */}
         <div style={styles.panel}>
           <h2>Party Influence</h2>
-
           {Object.entries(partyMap || {}).map(([party, info]) => (
             <div key={party} style={styles.row}>
               <span>{party}</span>
@@ -140,7 +121,6 @@ function App() {
           ))}
         </div>
 
-        {/* GRAPH */}
         <iframe
           src="https://neims-dashboard-2.onrender.com/graph"
           width="100%"
@@ -149,7 +129,6 @@ function App() {
           title="graph"
         />
 
-        {/* NEWS */}
         <h2>Live News</h2>
 
         <div style={styles.newsGrid}>
@@ -165,7 +144,7 @@ function App() {
   );
 }
 
-/* 🎨 STYLES */
+/* STYLES */
 const styles = {
   loading: {
     height: "100vh",
@@ -200,19 +179,17 @@ const styles = {
   menu: { listStyle: "none", padding: 0 },
 
   logout: {
-  marginTop: "20px",
-  padding: "10px",
-  cursor: "pointer",
-},
+    marginTop: "20px",
+    padding: "10px",
+    cursor: "pointer",
+  },
 
-main: {
-  flex: 1,
-  padding: "20px",
-  background: "#0f172a",
-  color: "white",
-},
-
-  main: { flex: 1, padding: "20px", background: "#0f172a", color: "white" },
+  main: {
+    flex: 1,
+    padding: "20px",
+    background: "#0f172a",
+    color: "white",
+  },
 
   kpiGrid: {
     display: "grid",
