@@ -33,11 +33,11 @@ function App() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-    } catch (error) {
+      setUser(null);
+  }   catch (error) {
       console.error("Logout error:", error);
-    }
-  };
-
+}
+};
   // 📊 FETCH BACKEND DATA
   useEffect(() => {
     fetch("https://neims-dashboard-2.onrender.com/news")
@@ -199,7 +199,18 @@ const styles = {
 
   menu: { listStyle: "none", padding: 0 },
 
-  logout: { marginTop: "20px" },
+  logout: {
+  marginTop: "20px",
+  padding: "10px",
+  cursor: "pointer",
+},
+
+main: {
+  flex: 1,
+  padding: "20px",
+  background: "#0f172a",
+  color: "white",
+},
 
   main: { flex: 1, padding: "20px", background: "#0f172a", color: "white" },
 
