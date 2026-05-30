@@ -1,5 +1,11 @@
 import { auth, provider } from "./firebase";
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "firebase/auth";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -10,8 +16,10 @@ function App() {
   const [partyMap, setPartyMap] = useState({});
   const [articles, setArticles] = useState([]);
 
-  // AUTH LISTENER
+  // 🔐 AUTH SETUP
   useEffect(() => {
+    setPersistence(auth, browserLocalPersistence);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
@@ -20,7 +28,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // LOGIN
+  // 🔑 LOGIN
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, provider);
@@ -29,19 +37,21 @@ function App() {
     }
   };
 
-  // LOGOUT (FIXED)
+  // 🔓 LOGOUT (FIXED & CLEAN)
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      await auth.signOut(); // extra safety clear
+
       localStorage.clear();
       sessionStorage.clear();
-      setUser(null);
+
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
-  // FETCH DATA
+  // 📊 FETCH DATA
   useEffect(() => {
     fetch("https://neims-dashboard-2.onrender.com/news")
       .then((res) => res.json())
@@ -59,10 +69,16 @@ function App() {
       .catch((err) => console.error(err));
   }, []);
 
+  // ⏳ LOADING
   if (loading) {
-    return <div style={styles.loading}>Loading...</div>;
+    return (
+      <div style={styles.loading}>
+        Loading NEIMS Intelligence System...
+      </div>
+    );
   }
 
+  // 🔴 LOGIN SCREEN
   if (!user) {
     return (
       <div style={styles.login}>
@@ -74,13 +90,15 @@ function App() {
     );
   }
 
-  const positiveCount = articles.filter(a => a.sentiment === "positive").length;
-  const negativeCount = articles.filter(a => a.sentiment === "negative").length;
-  const neutralCount = articles.filter(a => a.sentiment === "neutral").length;
+  // 📊 METRICS
+  const positive = articles.filter(a => a.sentiment === "positive").length;
+  const negative = articles.filter(a => a.sentiment === "negative").length;
+  const neutral = articles.filter(a => a.sentiment === "neutral").length;
 
   return (
     <div style={styles.app}>
 
+      {/* SIDEBAR */}
       <div style={styles.sidebar}>
         <h2>NEIMS</h2>
 
@@ -96,23 +114,28 @@ function App() {
         </button>
       </div>
 
+      {/* MAIN */}
       <div style={styles.main}>
         <h1>🇳🇬 NEIMS Dashboard</h1>
 
+        {/* KPI */}
         <div style={styles.kpiGrid}>
           <div style={styles.card}>Total: {articles.length}</div>
-          <div style={styles.green}>Positive: {positiveCount}</div>
-          <div style={styles.red}>Negative: {negativeCount}</div>
-          <div style={styles.gray}>Neutral: {neutralCount}</div>
+          <div style={styles.green}>Positive: {positive}</div>
+          <div style={styles.red}>Negative: {negative}</div>
+          <div style={styles.gray}>Neutral: {neutral}</div>
         </div>
 
+        {/* INSIGHTS */}
         <div style={styles.panel}>
           <h2>Election Pressure Index</h2>
           <h1>{insights?.election_pressure_score ?? 0}</h1>
         </div>
 
+        {/* PARTY MAP */}
         <div style={styles.panel}>
-          <h2>Party Influence</h2>
+          <h2>Party Influence Map</h2>
+
           {Object.entries(partyMap || {}).map(([party, info]) => (
             <div key={party} style={styles.row}>
               <span>{party}</span>
@@ -121,6 +144,7 @@ function App() {
           ))}
         </div>
 
+        {/* GRAPH */}
         <iframe
           src="https://neims-dashboard-2.onrender.com/graph"
           width="100%"
@@ -129,7 +153,8 @@ function App() {
           title="graph"
         />
 
-        <h2>Live News</h2>
+        {/* NEWS */}
+        <h2>Live News Feed</h2>
 
         <div style={styles.newsGrid}>
           {articles.map((a, i) => (
@@ -144,7 +169,7 @@ function App() {
   );
 }
 
-/* STYLES */
+/* 🎨 STYLES */
 const styles = {
   loading: {
     height: "100vh",
@@ -165,9 +190,16 @@ const styles = {
     color: "white",
   },
 
-  button: { padding: "10px 20px", marginTop: "20px" },
+  button: {
+    padding: "10px 20px",
+    marginTop: "20px",
+    cursor: "pointer",
+  },
 
-  app: { display: "flex", fontFamily: "Arial" },
+  app: {
+    display: "flex",
+    fontFamily: "Arial",
+  },
 
   sidebar: {
     width: "220px",
@@ -176,7 +208,10 @@ const styles = {
     padding: "20px",
   },
 
-  menu: { listStyle: "none", padding: 0 },
+  menu: {
+    listStyle: "none",
+    padding: 0,
+  },
 
   logout: {
     marginTop: "20px",
@@ -202,11 +237,21 @@ const styles = {
   red: { background: "#7f1d1d", padding: "10px" },
   gray: { background: "#334155", padding: "10px" },
 
-  panel: { marginTop: "20px", background: "#1e293b", padding: "10px" },
+  panel: {
+    marginTop: "20px",
+    background: "#1e293b",
+    padding: "10px",
+  },
 
-  row: { display: "flex", justifyContent: "space-between" },
+  row: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
 
-  iframe: { border: "none", marginTop: "20px" },
+  iframe: {
+    border: "none",
+    marginTop: "20px",
+  },
 
   newsGrid: {
     display: "grid",
@@ -214,7 +259,10 @@ const styles = {
     gap: "10px",
   },
 
-  newsCard: { background: "#1e293b", padding: "10px" },
+  newsCard: {
+    background: "#1e293b",
+    padding: "10px",
+  },
 };
 
 export default App;
