@@ -2,27 +2,23 @@ import { auth, provider } from "./firebase";
 import {
   signInWithPopup,
   signOut,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
+  onAuthStateChanged
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
 
   const [insights, setInsights] = useState({});
   const [partyMap, setPartyMap] = useState({});
   const [articles, setArticles] = useState([]);
 
-  // 🔐 AUTH SETUP
+  // 🔐 AUTH LISTENER (FIXED)
   useEffect(() => {
-    setPersistence(auth, browserLocalPersistence);
-
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setAuthReady(true);
     });
 
     return () => unsubscribe();
@@ -37,15 +33,11 @@ function App() {
     }
   };
 
-  // 🔓 LOGOUT (FIXED & CLEAN)
+  // 🔓 LOGOUT
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      await auth.signOut(); // extra safety clear
-
-      localStorage.clear();
-      sessionStorage.clear();
-
+      setUser(null);
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -56,24 +48,24 @@ function App() {
     fetch("https://neims-dashboard-2.onrender.com/news")
       .then((res) => res.json())
       .then((data) => setArticles(data?.articles || []))
-      .catch((err) => console.error(err));
+      .catch(console.error);
 
     fetch("https://neims-dashboard-2.onrender.com/party-map")
       .then((res) => res.json())
       .then((data) => setPartyMap(data || {}))
-      .catch((err) => console.error(err));
+      .catch(console.error);
 
     fetch("https://neims-dashboard-2.onrender.com/insights")
       .then((res) => res.json())
       .then((data) => setInsights(data || {}))
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }, []);
 
-  // ⏳ LOADING
-  if (loading) {
+  // ⏳ WAIT FOR AUTH CHECK (CRITICAL FIX)
+  if (!authReady) {
     return (
       <div style={styles.loading}>
-        Loading NEIMS Intelligence System...
+        Checking authentication...
       </div>
     );
   }
@@ -118,7 +110,6 @@ function App() {
       <div style={styles.main}>
         <h1>🇳🇬 NEIMS Dashboard</h1>
 
-        {/* KPI */}
         <div style={styles.kpiGrid}>
           <div style={styles.card}>Total: {articles.length}</div>
           <div style={styles.green}>Positive: {positive}</div>
@@ -126,13 +117,11 @@ function App() {
           <div style={styles.gray}>Neutral: {neutral}</div>
         </div>
 
-        {/* INSIGHTS */}
         <div style={styles.panel}>
           <h2>Election Pressure Index</h2>
           <h1>{insights?.election_pressure_score ?? 0}</h1>
         </div>
 
-        {/* PARTY MAP */}
         <div style={styles.panel}>
           <h2>Party Influence Map</h2>
 
@@ -144,7 +133,6 @@ function App() {
           ))}
         </div>
 
-        {/* GRAPH */}
         <iframe
           src="https://neims-dashboard-2.onrender.com/graph"
           width="100%"
@@ -153,7 +141,6 @@ function App() {
           title="graph"
         />
 
-        {/* NEWS */}
         <h2>Live News Feed</h2>
 
         <div style={styles.newsGrid}>
